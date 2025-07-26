@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Física con Jose</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>Física con Jose</h1>
+        <div id="info-bar" class="hidden">
+            <p>Puntaje: <span id="score-display">0</span></p>
+            <p>Jugador: <span id="player-name-display"></span></p>
+            <p>Posición: <span id="position-display">0 / 30</span></p>
+        </div>
+
+        <div id="content-area">
+            <video id="main-video" controls>
+                <source src="assets/Intro.mp4" type="video/mp4">
+                Tu navegador no soporta videos.
+            </video>
+            
+            <div id="name-prompt">
+                <h3>Escribe tu nombre para empezar:</h3>
+                <input type="text" id="name-input" placeholder="Tu nombre aquí" maxlength="20">
+            </div>
+
+            <button id="start-btn">Comenzar Juego</button>
+        </div>
+        
+        <button id="play-again-btn" class="hidden">Jugar de Nuevo</button>
+    </div>
+
+    <div id="question-popup" class="popup-container hidden">
+        <div class="popup-content">
+            <h2 id="question-text">Aquí va el texto de la pregunta</h2>
+            <div id="options-container"></div>
+            <button id="skip-btn">Saltar a la última pregunta</button>
+        </div>
+    </div>
+    
+    <div id="feedback-popup" class="popup-container hidden">
+         <div class="popup-content">
+            <video id="feedback-video" autoplay></video>
+         </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

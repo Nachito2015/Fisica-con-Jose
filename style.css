@@ -1,0 +1,155 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e8f5ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Usamos min-height para mejor compatibilidad */
+    margin: 0;
+    padding: 10px; /* Añadimos un poco de padding por si el contenido se desborda */
+    box-sizing: border-box; /* Importante para el cálculo de tamaños */
+    text-align: center;
+}
+
+#game-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Ocupa el 100% del espacio disponible */
+    max-width: 700px; /* Pero no más de 700px en pantallas grandes */
+}
+
+#info-bar {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea si no caben */
+    justify-content: space-around;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #0d47a1;
+}
+
+#content-area {
+    min-height: 200px; /* Hacemos la altura mínima más flexible */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- ESTILOS AÑADIDOS PARA RESPONSIVE --- */
+#main-video, #feedback-video, #final-video {
+    width: 100%; /* Ocupa el 100% del ancho de su contenedor */
+    max-width: 640px; /* Pero nunca será más grande que 640px */
+    height: auto; /* Mantiene la proporción alto/ancho automáticamente */
+}
+/* --- FIN DE ESTILOS AÑADIDOS --- */
+
+
+/* Estilo de los botones principales */
+#start-btn, #play-again-btn {
+    font-size: 1.2em;
+    padding: 15px 30px;
+    margin-top: 20px;
+    cursor: pointer;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+#start-btn:hover, #play-again-btn:hover {
+    background-color: #0d47a1;
+}
+
+/* Estilos para el campo de nombre */
+#name-prompt {
+    margin-top: 15px;
+}
+
+#name-prompt h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#name-input {
+    padding: 10px;
+    font-size: 1.1em;
+    width: 80%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* Estilos para los Popups */
+.popup-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 100;
+}
+
+.popup-content {
+    background-color: white; padding: 20px; border-radius: 10px;
+    width: 90%; max-width: 600px;
+}
+
+#options-container button {
+    display: block; width: 100%; padding: 15px; margin: 10px 0;
+    font-size: 1em; border: 1px solid #ccc; border-radius: 5px;
+    cursor: pointer; background-color: #f0f0f0; transition: background-color 0.2s;
+}
+
+#options-container button:hover {
+    background-color: #dce4f7;
+}
+
+#skip-btn {
+    font-size: 0.9em;
+    padding: 8px 15px;
+    margin-top: 20px;
+    cursor: pointer;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+#skip-btn:hover {
+    background-color: #5a6268;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- MEDIA QUERY PARA PANTALLAS PEQUEÑAS --- */
+@media (max-width: 600px) {
+    body {
+        padding: 0; /* Quitamos el padding en pantallas muy pequeñas */
+    }
+    #game-container {
+        padding: 15px;
+        height: 100%;
+        border-radius: 0;
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+    #info-bar {
+        font-size: 0.9em;
+    }
+    #options-container button {
+        padding: 12px;
+        font-size: 0.9em;
+    }
+    .popup-content {
+        padding: 15px;
+    }
+    h2#question-text {
+        font-size: 1.2em;
+    }
+}

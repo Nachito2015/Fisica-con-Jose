@@ -125,10 +125,10 @@ body {
     display: none !important;
 }
 
-/* Estilos para el contador (Corregido) */
+/* Estilos para el contador */
 #timer-display {
     position: absolute;
-    top: 5px; /* Sube el contador */
+    top: 5px;
     right: 20px;
     font-size: 1.2em;
     font-weight: bold;
@@ -160,5 +160,9 @@ body {
     }
     h2#question-text {
         font-size: 1.2em;
+    }
+    /* Ajuste para subir el contador en móviles */
+    #timer-display {
+        top: 2px;
     }
 }

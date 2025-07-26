@@ -12,12 +12,12 @@ const feedbackVideo = document.getElementById('feedback-video');
 const contentArea = document.getElementById('content-area');
 const skipBtn = document.getElementById('skip-btn');
 const playAgainBtn = document.getElementById('play-again-btn');
-// AÑADIDO: Referencias para el nombre del jugador
 const nameInput = document.getElementById('name-input');
 const namePrompt = document.getElementById('name-prompt');
 const playerNameDisplay = document.getElementById('player-name-display');
+const timerDisplay = document.getElementById('timer-display'); // Referencia al contador
 
-// --- 2. Datos del Juego (Banco de preguntas completo) ---
+// --- 2. Datos del Juego ---
 const QUESTIONS_POOL = [
     {"text": "¿Qué relaciona la Ley de Gauss para el campo eléctrico?", "options": ["Flujo magnético y corriente", "Flujo eléctrico y carga encerrada", "Campo eléctrico y potencial", "Resistencia y voltaje"], "correct_answer": "Flujo eléctrico y carga encerrada"},
     {"text": "El flujo eléctrico a través de una superficie cerrada depende de...", "options": ["El tamaño de la superficie", "La forma de la superficie", "La carga neta encerrada", "El campo magnético externo"], "correct_answer": "La carga neta encerrada"},
@@ -53,12 +53,30 @@ const QUESTIONS_POOL = [
 
 const questions = QUESTIONS_POOL.sort(() => 0.5 - Math.random()).slice(0, 30);
 
+// --- 3. Estado del Juego ---
 let score = 0;
 let currentPosition = 0;
 let currentQuestionIndex = 0;
-let playerName = ''; // Variable para guardar el nombre
+let playerName = '';
+let questionTimer = null; // Variable para el temporizador
+
+// --- 4. Funciones Principales ---
+
+function stopTimer() {
+    if (questionTimer) {
+        clearInterval(questionTimer);
+        questionTimer = null;
+    }
+}
+
+function handleTimeout() {
+    stopTimer();
+    questionPopup.classList.add('hidden');
+    playFeedbackVideo('assets/te_espero.mp4'); // Se considera respuesta incorrecta
+}
 
 function checkAnswer(selectedOption) {
+    stopTimer(); // Detenemos el timer en cuanto el usuario responde
     const currentQuestion = questions[currentQuestionIndex];
     questionPopup.classList.add('hidden');
 
@@ -109,15 +127,26 @@ function showQuestion(questionIndex) {
     }
 
     questionPopup.classList.remove('hidden');
+
+    // Iniciar el contador para esta pregunta
+    let timeLeft = 12;
+    timerDisplay.innerText = `Tiempo: ${timeLeft}`;
+    stopTimer(); // Asegurarnos de limpiar cualquier timer anterior
+    questionTimer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.innerText = `Tiempo: ${timeLeft}`;
+        if (timeLeft <= 0) {
+            handleTimeout();
+        }
+    }, 1000);
 }
 
 function playWelcomeVideo() {
-    // AÑADIDO: Guardar el nombre y mostrarlo
     playerName = nameInput.value.trim() || 'Jugador Anónimo';
     playerNameDisplay.innerText = playerName;
 
     startBtn.classList.add('hidden');
-    namePrompt.classList.add('hidden'); // Ocultamos el campo de nombre
+    namePrompt.classList.add('hidden');
     mainVideo.src = 'assets/welcome_video.mp4';
     mainVideo.controls = false;
     mainVideo.play();
@@ -134,6 +163,7 @@ function startGame() {
 }
 
 function skipToEnd() {
+    stopTimer(); // Detener el timer si se salta
     questionPopup.classList.add('hidden');
     feedbackPopup.classList.add('hidden');
     
@@ -153,7 +183,6 @@ function endGame() {
     else if (score >= 20) finalLevel = "Estudiante de IFD o CERP";
     else finalLevel = "Estudiante de Secundaria";
     
-    // AÑADIDO: Mostrar el nombre del jugador en el mensaje final
     contentArea.innerHTML = `<p style="font-size: 1.5em;">¡Juego terminado, ${playerName}! Tu nivel es:<br><strong>${finalLevel}</strong></p>`;
     
     const finalVideo = document.createElement('video');

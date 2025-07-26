@@ -5,10 +5,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Usamos min-height para mejor compatibilidad */
+    min-height: 100vh;
     margin: 0;
-    padding: 10px; /* Añadimos un poco de padding por si el contenido se desborda */
-    box-sizing: border-box; /* Importante para el cálculo de tamaños */
+    padding: 10px;
+    box-sizing: border-box;
     text-align: center;
 }
 
@@ -17,13 +17,13 @@ body {
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Ocupa el 100% del espacio disponible */
-    max-width: 700px; /* Pero no más de 700px en pantallas grandes */
+    width: 100%;
+    max-width: 700px;
 }
 
 #info-bar {
     display: flex;
-    flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea si no caben */
+    flex-wrap: wrap;
     justify-content: space-around;
     align-items: center;
     font-weight: bold;
@@ -32,21 +32,18 @@ body {
 }
 
 #content-area {
-    min-height: 200px; /* Hacemos la altura mínima más flexible */
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-/* --- ESTILOS AÑADIDOS PARA RESPONSIVE --- */
 #main-video, #feedback-video, #final-video {
-    width: 100%; /* Ocupa el 100% del ancho de su contenedor */
-    max-width: 640px; /* Pero nunca será más grande que 640px */
-    height: auto; /* Mantiene la proporción alto/ancho automáticamente */
+    width: 100%;
+    max-width: 640px;
+    height: auto;
 }
-/* --- FIN DE ESTILOS AÑADIDOS --- */
-
 
 /* Estilo de los botones principales */
 #start-btn, #play-again-btn {
@@ -96,6 +93,7 @@ body {
 .popup-content {
     background-color: white; padding: 20px; border-radius: 10px;
     width: 90%; max-width: 600px;
+    position: relative;
 }
 
 #options-container button {
@@ -118,6 +116,7 @@ body {
     border: none;
     border-radius: 5px;
 }
+
 #skip-btn:hover {
     background-color: #5a6268;
 }
@@ -126,10 +125,20 @@ body {
     display: none !important;
 }
 
-/* --- MEDIA QUERY PARA PANTALLAS PEQUEÑAS --- */
+/* Estilos para el contador (Corregido) */
+#timer-display {
+    position: absolute;
+    top: 5px; /* Sube el contador */
+    right: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #d32f2f;
+}
+
+/* Media Query para pantallas pequeñas */
 @media (max-width: 600px) {
     body {
-        padding: 0; /* Quitamos el padding en pantallas muy pequeñas */
+        padding: 0;
     }
     #game-container {
         padding: 15px;

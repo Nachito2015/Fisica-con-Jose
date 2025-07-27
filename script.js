@@ -27,6 +27,7 @@ const modeSelectionScreen = document.getElementById('mode-selection-screen');
 const competitionModeBtn = document.getElementById('competition-mode-btn');
 const studyModeBtn = document.getElementById('study-mode-btn');
 const startBtn = document.getElementById('start-btn');
+const rankingContainer = document.getElementById('ranking-container');
 
 
 // --- 2. Datos del Juego (sin cambios) ---
@@ -229,7 +230,6 @@ function showQuestion(questionIndex) {
     }
 }
 
-// --- FUNCIÓN AÑADIDA ---
 function useJoker5050() {
     if (jokersLeft <= 0) return;
 
@@ -250,7 +250,6 @@ function useJoker5050() {
         }
     });
 }
-// --- FIN FUNCIÓN AÑADIDA ---
 
 
 function selectMode(mode) {
@@ -304,9 +303,53 @@ function skipToEnd() {
     showQuestion(currentQuestionIndex);
 }
 
-function endGame() {
+// --- NUEVAS FUNCIONES PARA FIREBASE ---
+async function saveScore() {
+    if (gameMode !== 'competition' || !playerName) {
+        return; // Solo guardamos puntajes en modo competencia
+    }
+    try {
+        await db.collection("scores").add({
+            name: playerName,
+            score: score,
+            percentage: Math.round((score / questions.length) * 100),
+            timestamp: new Date()
+        });
+        console.log("Puntaje guardado en Firebase exitosamente.");
+    } catch (error) {
+        console.error("Error al guardar el puntaje: ", error);
+    }
+}
+
+async function displayRanking() {
+    rankingContainer.classList.remove('hidden');
+    rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>Cargando...</p>';
+
+    try {
+        const querySnapshot = await db.collection("scores").orderBy("score", "desc").limit(10).get();
+        let rankingHtml = '<table><tr><th>Pos.</th><th>Nombre</th><th>Puntaje</th></tr>';
+        let rank = 1;
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            rankingHtml += `<tr><td>${rank}</td><td>${data.name}</td><td>${data.score}</td></tr>`;
+            rank++;
+        });
+        rankingHtml += '</table>';
+        rankingContainer.innerHTML = rankingHtml;
+    } catch (error) {
+        console.error("Error al obtener el ranking: ", error);
+        rankingContainer.innerHTML = '<p>No se pudo cargar el ranking.</p>';
+    }
+}
+// --- FIN NUEVAS FUNCIONES ---
+
+
+// --- FUNCIÓN MODIFICADA ---
+async function endGame() {
     infoBar.classList.add('hidden');
     progressBarContainer.classList.add('hidden');
+
+    await saveScore(); // Guardamos el puntaje antes de mostrar los resultados
 
     const percentage = Math.round((score / questions.length) * 100);
     let finalLevel = "";
@@ -337,6 +380,8 @@ function endGame() {
     }
     contentArea.appendChild(summaryDiv);
     
+    await displayRanking(); // Mostramos el ranking después del resumen
+
     const finalVideo = document.createElement('video');
     finalVideo.src = 'assets/final.mp4';
     finalVideo.controls = true;
@@ -347,6 +392,8 @@ function endGame() {
     contentArea.appendChild(playAgainBtn);
     playAgainBtn.classList.remove('hidden');
 }
+// --- FIN FUNCIÓN MODIFICADA ---
+
 
 // --- Event Listeners ---
 mainVideo.addEventListener('ended', () => {

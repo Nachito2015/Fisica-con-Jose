@@ -54,6 +54,8 @@
                 <input type="text" id="name-input" placeholder="Tu nombre aquí" maxlength="20">
                 <button id="start-btn">Comenzar Juego</button>
             </div>
+            
+            <div id="ranking-container" class="hidden"></div>
         </div>
         
         <button id="play-again-btn" class="hidden">Jugar de Nuevo</button>
@@ -64,19 +66,17 @@
             <p id="timer-display"><i class="fa-solid fa-clock"></i> <span id="timer-text">12</span></p>
             <h2 id="question-text">Aquí va el texto de la pregunta</h2>
             <div id="options-container"></div>
-            
             <div class="popup-actions">
                 <button id="skip-btn">Saltar a la última pregunta</button>
                 <button id="joker-5050-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> 50/50 <span id="joker-count">(1)</span></button>
             </div>
-
         </div>
     </div>
     
     <div id="feedback-popup" class="popup-container">
-         <div class="popup-content">
+        <div class="popup-content">
             <video id="feedback-video" autoplay></video>
-         </div>
+        </div>
     </div>
 
     <div id="explanation-popup" class="popup-container">
@@ -86,6 +86,24 @@
             <button id="next-question-btn">Siguiente Pregunta</button>
         </div>
     </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+      // Tu configuración de Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyDF_iS35VE5seJsNGzublSCyg8iLmTZtAQ",
+        authDomain: "fisica-con-jose.firebaseapp.com",
+        projectId: "fisica-con-jose",
+        storageBucket: "fisica-con-jose.firebasestorage.app",
+        messagingSenderId: "199448190768",
+        appId: "1:199448190768:web:30a17405d6b124788632f5"
+      };
+
+      // Inicializar Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore(); // Esta es nuestra referencia a la base de datos
+    </script>
 
     <script src="script.js"></script>
 </body>

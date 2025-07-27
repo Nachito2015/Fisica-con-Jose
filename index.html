@@ -4,48 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Física con Jose</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="game-container">
         <h1>Física con Jose</h1>
+        
+        <div id="progress-bar-container" class="hidden">
+            <div id="progress-bar"></div>
+        </div>
+
         <div id="info-bar" class="hidden">
-            <p>Puntaje: <span id="score-display">0</span></p>
-            <p>Jugador: <span id="player-name-display"></span></p>
-            <p>Posición: <span id="position-display">0 / 30</span></p>
+            <p><i class="fa-solid fa-star"></i> <span id="score-display">0</span></p>
+            <p><i class="fa-solid fa-user"></i> <span id="player-name-display"></span></p>
+            <p><i class="fa-solid fa-map-pin"></i> <span id="position-display">0 / 30</span></p>
         </div>
 
         <div id="content-area">
-            <video id="main-video" controls>
-                <source src="assets/Intro.mp4" type="video/mp4">
-                Tu navegador no soporta videos.
-            </video>
-            
-            <div id="name-prompt">
-                <h3>Escribe tu nombre para empezar:</h3>
-                <input type="text" id="name-input" placeholder="Tu nombre aquí" maxlength="20">
+            <div id="initial-screen">
+                <video id="main-video" controls>
+                    <source src="assets/Intro.mp4" type="video/mp4">
+                    Tu navegador no soporta videos.
+                </video>
             </div>
 
-            <button id="start-btn">Comenzar Juego</button>
+            <div id="mode-selection-screen" class="hidden">
+                <h3>Elige un modo de juego</h3>
+                <div class="mode-buttons">
+                    <button class="mode-btn" id="competition-mode-btn">
+                        <i class="fa-solid fa-trophy"></i> Modo Competencia
+                        <span>Con tiempo y puntaje</span>
+                    </button>
+                    <button class="mode-btn" id="study-mode-btn">
+                        <i class="fa-solid fa-book-open"></i> Modo Estudio
+                        <span>Sin tiempo y con explicaciones</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="name-prompt" class="hidden">
+                <h3>Escribe tu nombre para empezar:</h3>
+                <input type="text" id="name-input" placeholder="Tu nombre aquí" maxlength="20">
+                <button id="start-btn">Comenzar Juego</button>
+            </div>
         </div>
         
         <button id="play-again-btn" class="hidden">Jugar de Nuevo</button>
     </div>
 
-    <div id="question-popup" class="popup-container hidden">
+    <div id="question-popup" class="popup-container">
         <div class="popup-content">
-            <p id="timer-display">Tiempo: 12</p>
+            <p id="timer-display"><i class="fa-solid fa-clock"></i> <span id="timer-text">12</span></p>
             <h2 id="question-text">Aquí va el texto de la pregunta</h2>
             <div id="options-container"></div>
-            <button id="skip-btn">Saltar a la última pregunta</button>
+            
+            <div class="popup-actions">
+                <button id="skip-btn">Saltar a la última pregunta</button>
+                <button id="joker-5050-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> 50/50 <span id="joker-count">(1)</span></button>
+            </div>
+
         </div>
     </div>
     
-    <div id="feedback-popup" class="popup-container hidden">
+    <div id="feedback-popup" class="popup-container">
          <div class="popup-content">
             <video id="feedback-video" autoplay></video>
          </div>
+    </div>
+
+    <div id="explanation-popup" class="popup-container">
+        <div class="popup-content">
+            <h3>Explicación</h3>
+            <p id="explanation-text"></p>
+            <button id="next-question-btn">Siguiente Pregunta</button>
+        </div>
     </div>
 
     <script src="script.js"></script>

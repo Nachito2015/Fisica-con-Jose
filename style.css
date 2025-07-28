@@ -291,12 +291,19 @@ body {
     color: #333;
 }
 
-/* Estilos para la Tabla de Ranking */
+/* --- ESTILOS MODIFICADOS: Tabla de Ranking con Scroll --- */
 #ranking-container {
     margin-top: 20px;
     width: 100%;
     max-width: 500px;
+    
+    /* AÑADIDO: Altura máxima y scroll */
+    max-height: 250px; /* Define una altura máxima para la tabla */
+    overflow-y: auto;  /* Añade una barra de scroll vertical SÓLO si es necesario */
+    border: 1px solid #eee;
+    border-radius: 8px;
 }
+
 #ranking-container h3 {
     margin-bottom: 10px;
 }
@@ -306,13 +313,17 @@ body {
 }
 #ranking-container th, #ranking-container td {
     padding: 8px;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     text-align: center;
 }
 #ranking-container th {
     background-color: #f2f2f2;
     font-weight: bold;
+    position: sticky; /* Fija la cabecera al hacer scroll */
+    top: 0;
 }
+/* --- FIN ESTILOS MODIFICADOS --- */
+
 
 @media (max-width: 600px) {
     body { padding: 0; }

@@ -30,7 +30,7 @@ const startBtn = document.getElementById('start-btn');
 const rankingContainer = document.getElementById('ranking-container');
 
 
-// --- 2. Datos del Juego (sin cambios) ---
+// --- 2. Datos del Juego ---
 const QUESTIONS_POOL = [
     {"text": "¿Qué relaciona la Ley de Gauss para el campo eléctrico?", "options": ["Flujo magnético y corriente", "Flujo eléctrico y carga encerrada", "Campo eléctrico y potencial", "Resistencia y voltaje"], "correct_answer": "Flujo eléctrico y carga encerrada", "explanation": "La Ley de Gauss establece que el flujo eléctrico neto a través de una superficie cerrada es directamente proporcional a la carga eléctrica neta encerrada por la superficie.", "category": "Electromagnetismo"},
     {"text": "La Ley de Gauss para el campo magnético implica que...", "options": ["Existen monopolos magnéticos", "El flujo magnético neto es siempre cero", "El campo magnético es conservativo", "Las cargas magnéticas se conservan"], "correct_answer": "El flujo magnético neto es siempre cero", "explanation": "Esta ley indica que no existen monopolos magnéticos (polos norte o sur aislados). Por lo tanto, las líneas de campo magnético siempre son cerradas.", "category": "Electromagnetismo"},
@@ -304,6 +304,7 @@ function skipToEnd() {
 }
 
 async function saveScore() {
+    // Solo guardamos puntajes en modo competencia y si hay un nombre
     if (gameMode !== 'competition' || !playerName) {
         return;
     }
@@ -320,13 +321,14 @@ async function saveScore() {
     }
 }
 
-// --- FUNCIÓN MODIFICADA ---
 async function displayRanking() {
+    // Solo mostramos ranking en modo competencia
+    if (gameMode !== 'competition') return;
+
     rankingContainer.classList.remove('hidden');
     rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>Cargando...</p>';
 
     try {
-        // Usamos .get() que es el método correcto para obtener los datos una vez
         const querySnapshot = await db.collection("scores").orderBy("score", "desc").limit(10).get();
         
         if (querySnapshot.empty) {
@@ -338,17 +340,20 @@ async function displayRanking() {
         let rank = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            rankingHtml += `<tr><td>${rank}</td><td>${data.name}</td><td>${data.score}</td></tr>`;
+            // Asegurarse de que los datos existen antes de mostrarlos
+            const name = data.name || 'Anónimo';
+            const scoreValue = data.score !== undefined ? data.score : 'N/A';
+            rankingHtml += `<tr><td>${rank}</td><td>${name}</td><td>${scoreValue}</td></tr>`;
             rank++;
         });
         rankingHtml += '</tbody></table>';
         rankingContainer.innerHTML = rankingHtml;
+
     } catch (error) {
         console.error("Error al obtener el ranking: ", error);
         rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>No se pudo cargar el ranking.</p>';
     }
 }
-// --- FIN FUNCIÓN MODIFICADA ---
 
 
 async function endGame() {
@@ -386,7 +391,10 @@ async function endGame() {
     }
     contentArea.appendChild(summaryDiv);
     
-    await displayRanking();
+    // Solo mostramos el ranking en modo competencia
+    if (gameMode === 'competition') {
+        await displayRanking();
+    }
 
     const finalVideo = document.createElement('video');
     finalVideo.src = 'assets/final.mp4';

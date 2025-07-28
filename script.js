@@ -77,234 +77,24 @@ let categoryPerformance = {};
 let jokersLeft = 1;
 let gameMode = '';
 
-// --- 4. Funciones Principales ---
+// --- 4. Funciones Principales (el resto sin cambios) ---
 
-function stopTimer() {
-    if (questionTimer) {
-        clearInterval(questionTimer);
-        questionTimer = null;
-    }
-}
-
-function updateCategoryPerformance(question, isCorrect) {
-    const category = question.category || 'General';
-    if (!categoryPerformance[category]) {
-        categoryPerformance[category] = { correct: 0, total: 0 };
-    }
-    categoryPerformance[category].total++;
-    if (isCorrect) {
-        categoryPerformance[category].correct++;
-    }
-}
-
-function handleTimeout() {
-    stopTimer();
-    lastAnswerWasCorrect = false;
-    const currentQuestion = questions[currentQuestionIndex];
-    updateCategoryPerformance(currentQuestion, false);
-
-    const buttons = optionsContainer.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.disabled = true;
-        if (button.innerText === currentQuestion.correct_answer) {
-            button.classList.add('correct');
-        }
-    });
-    setTimeout(() => {
-        questionPopup.classList.remove('active');
-        playFeedbackVideo('assets/te_espero.mp4');
-    }, 1200);
-}
-
-
-function checkAnswer(selectedOption, clickedButton) {
-    stopTimer();
-    const currentQuestion = questions[currentQuestionIndex];
-    const isCorrect = selectedOption === currentQuestion.correct_answer;
-    lastAnswerWasCorrect = isCorrect;
-    updateCategoryPerformance(currentQuestion, isCorrect);
-
-    const buttons = optionsContainer.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.disabled = true;
-        if (button.innerText === currentQuestion.correct_answer) {
-            button.classList.add('correct');
-        }
-    });
-
-    if (!isCorrect) {
-        clickedButton.classList.add('incorrect');
-    }
-
-    if (isCorrect) {
-        score++;
-    }
-    scoreDisplay.innerText = score;
-
-    setTimeout(() => {
-        questionPopup.classList.remove('active');
-        if (isCorrect) {
-            playFeedbackVideo('assets/muy_bien.mp4');
-        } else {
-            playFeedbackVideo('assets/te_espero.mp4');
-        }
-    }, 1200);
-}
-
-function playFeedbackVideo(videoSrc) {
-    feedbackPopup.classList.add('active');
-    feedbackVideo.src = videoSrc;
-    feedbackVideo.play();
-}
-
-function showExplanationOrNextQuestion() {
-    feedbackPopup.classList.remove('active');
-    const question = questions[currentQuestionIndex];
-
-    const shouldShowExplanation = (gameMode === 'study' || !lastAnswerWasCorrect) && question.explanation;
-
-    if (shouldShowExplanation) {
-        explanationText.innerText = question.explanation;
-        explanationPopup.classList.add('active');
-    } else {
-        showNextQuestion();
-    }
-}
-
-function showNextQuestion() {
-    explanationPopup.classList.remove('active');
-    currentQuestionIndex++;
-    currentPosition++;
-    
-    if (currentQuestionIndex < questions.length) {
-        positionDisplay.innerText = `${currentPosition} / ${questions.length}`;
-        updateProgressBar();
-        showQuestion(currentQuestionIndex);
-    } else {
-        endGame();
-    }
-}
-
-function showQuestion(questionIndex) {
-    const question = questions[questionIndex];
-    questionText.innerText = question.text;
-    optionsContainer.innerHTML = ''; 
-
-    question.options.forEach(optionText => {
-        const button = document.createElement('button');
-        button.innerText = optionText;
-        button.onclick = () => checkAnswer(optionText, button);
-        optionsContainer.appendChild(button);
-    });
-
-    if (questionIndex === questions.length - 1) {
-        skipBtn.classList.add('hidden');
-    } else {
-        skipBtn.classList.remove('hidden');
-    }
-    
-    jokerBtn.disabled = jokersLeft <= 0;
-    jokerCount.innerText = `(${jokersLeft})`;
-
-    if (gameMode === 'study') {
-        timerText.parentElement.classList.add('hidden');
-        jokerBtn.classList.add('hidden');
-    } else {
-        timerText.parentElement.classList.remove('hidden');
-        jokerBtn.classList.remove('hidden');
-    }
-
-    questionPopup.classList.add('active');
-
-    if (gameMode === 'competition') {
-        let timeLeft = 12;
-        timerText.innerText = timeLeft;
-        stopTimer();
-        questionTimer = setInterval(() => {
-            timeLeft--;
-            timerText.innerText = timeLeft;
-            if (timeLeft <= 0) {
-                handleTimeout();
-            }
-        }, 1000);
-    }
-}
-
-function useJoker5050() {
-    if (jokersLeft <= 0) return;
-
-    jokersLeft--;
-    jokerBtn.disabled = true;
-    jokerCount.innerText = `(${jokersLeft})`;
-    
-    const currentQuestion = questions[currentQuestionIndex];
-    const buttons = optionsContainer.querySelectorAll('button');
-    
-    const incorrectOptions = currentQuestion.options.filter(opt => opt !== currentQuestion.correct_answer);
-    incorrectOptions.sort(() => 0.5 - Math.random());
-    const toRemove = incorrectOptions.slice(0, 2);
-
-    buttons.forEach(button => {
-        if (toRemove.includes(button.innerText)) {
-            button.classList.add('hidden');
-        }
-    });
-}
-
-
-function selectMode(mode) {
-    gameMode = mode;
-    modeSelectionScreen.classList.add('hidden');
-    namePrompt.classList.remove('hidden');
-}
-
-function playWelcomeVideo() {
-    playerName = nameInput.value.trim() || 'Jugador Anónimo';
-    playerNameDisplay.innerText = playerName;
-
-    namePrompt.classList.add('hidden');
-    initialScreen.classList.remove('hidden');
-    
-    mainVideo.src = 'assets/welcome_video.mp4';
-    mainVideo.controls = false;
-    mainVideo.play();
-    mainVideo.addEventListener('ended', startGame);
-}
-
-function startGame() {
-    initialScreen.classList.add('hidden');
-    infoBar.classList.remove('hidden');
-    progressBarContainer.classList.remove('hidden');
-    
-    jokersLeft = 1;
-    
-    currentPosition = 1;
-    positionDisplay.innerText = `${currentPosition} / ${questions.length}`;
-    updateProgressBar();
-    showQuestion(0);
-}
-
-function updateProgressBar() {
-    const progress = (currentPosition / questions.length) * 100;
-    progressBar.style.width = `${progress}%`;
-}
-
-
-function skipToEnd() {
-    stopTimer();
-    questionPopup.classList.remove('active');
-    feedbackPopup.classList.remove('active');
-    
-    currentQuestionIndex = questions.length - 1;
-    currentPosition = questions.length;
-    
-    positionDisplay.innerText = `${currentPosition} / ${questions.length}`;
-    updateProgressBar();
-    showQuestion(currentQuestionIndex);
-}
+function stopTimer() { if (questionTimer) { clearInterval(questionTimer); questionTimer = null; } }
+function updateCategoryPerformance(question, isCorrect) { const category = question.category || 'General'; if (!categoryPerformance[category]) { categoryPerformance[category] = { correct: 0, total: 0 }; } categoryPerformance[category].total++; if (isCorrect) { categoryPerformance[category].correct++; } }
+function handleTimeout() { stopTimer(); lastAnswerWasCorrect = false; const currentQuestion = questions[currentQuestionIndex]; updateCategoryPerformance(currentQuestion, false); const buttons = optionsContainer.querySelectorAll('button'); buttons.forEach(button => { button.disabled = true; if (button.innerText === currentQuestion.correct_answer) { button.classList.add('correct'); } }); setTimeout(() => { questionPopup.classList.remove('active'); playFeedbackVideo('assets/te_espero.mp4'); }, 1200); }
+function checkAnswer(selectedOption, clickedButton) { stopTimer(); const currentQuestion = questions[currentQuestionIndex]; const isCorrect = selectedOption === currentQuestion.correct_answer; lastAnswerWasCorrect = isCorrect; updateCategoryPerformance(currentQuestion, isCorrect); const buttons = optionsContainer.querySelectorAll('button'); buttons.forEach(button => { button.disabled = true; if (button.innerText === currentQuestion.correct_answer) { button.classList.add('correct'); } }); if (!isCorrect) { clickedButton.classList.add('incorrect'); } if (isCorrect) { score++; } scoreDisplay.innerText = score; setTimeout(() => { questionPopup.classList.remove('active'); if (isCorrect) { playFeedbackVideo('assets/muy_bien.mp4'); } else { playFeedbackVideo('assets/te_espero.mp4'); } }, 1200); }
+function playFeedbackVideo(videoSrc) { feedbackPopup.classList.add('active'); feedbackVideo.src = videoSrc; feedbackVideo.play(); }
+function showExplanationOrNextQuestion() { feedbackPopup.classList.remove('active'); const question = questions[currentQuestionIndex]; const shouldShowExplanation = (gameMode === 'study' || !lastAnswerWasCorrect) && question.explanation; if (shouldShowExplanation) { explanationText.innerText = question.explanation; explanationPopup.classList.add('active'); } else { showNextQuestion(); } }
+function showNextQuestion() { explanationPopup.classList.remove('active'); currentQuestionIndex++; currentPosition++; if (currentQuestionIndex < questions.length) { positionDisplay.innerText = `${currentPosition} / ${questions.length}`; updateProgressBar(); showQuestion(currentQuestionIndex); } else { endGame(); } }
+function showQuestion(questionIndex) { const question = questions[questionIndex]; questionText.innerText = question.text; optionsContainer.innerHTML = ''; question.options.forEach(optionText => { const button = document.createElement('button'); button.innerText = optionText; button.onclick = () => checkAnswer(optionText, button); optionsContainer.appendChild(button); }); if (questionIndex === questions.length - 1) { skipBtn.classList.add('hidden'); } else { skipBtn.classList.remove('hidden'); } jokerBtn.disabled = jokersLeft <= 0; jokerCount.innerText = `(${jokersLeft})`; if (gameMode === 'study') { timerText.parentElement.classList.add('hidden'); jokerBtn.classList.add('hidden'); } else { timerText.parentElement.classList.remove('hidden'); jokerBtn.classList.remove('hidden'); } questionPopup.classList.add('active'); if (gameMode === 'competition') { let timeLeft = 12; timerText.innerText = timeLeft; stopTimer(); questionTimer = setInterval(() => { timeLeft--; timerText.innerText = timeLeft; if (timeLeft <= 0) { handleTimeout(); } }, 1000); } }
+function useJoker5050() { if (jokersLeft <= 0) return; jokersLeft--; jokerBtn.disabled = true; jokerCount.innerText = `(${jokersLeft})`; const currentQuestion = questions[currentQuestionIndex]; const buttons = optionsContainer.querySelectorAll('button'); const incorrectOptions = currentQuestion.options.filter(opt => opt !== currentQuestion.correct_answer); incorrectOptions.sort(() => 0.5 - Math.random()); const toRemove = incorrectOptions.slice(0, 2); buttons.forEach(button => { if (toRemove.includes(button.innerText)) { button.classList.add('hidden'); } }); }
+function selectMode(mode) { gameMode = mode; modeSelectionScreen.classList.add('hidden'); namePrompt.classList.remove('hidden'); }
+function playWelcomeVideo() { playerName = nameInput.value.trim() || 'Jugador Anónimo'; playerNameDisplay.innerText = playerName; namePrompt.classList.add('hidden'); initialScreen.classList.remove('hidden'); mainVideo.src = 'assets/welcome_video.mp4'; mainVideo.controls = false; mainVideo.play(); mainVideo.addEventListener('ended', startGame); }
+function startGame() { initialScreen.classList.add('hidden'); infoBar.classList.remove('hidden'); progressBarContainer.classList.remove('hidden'); jokersLeft = 1; currentPosition = 1; positionDisplay.innerText = `${currentPosition} / ${questions.length}`; updateProgressBar(); showQuestion(0); }
+function updateProgressBar() { const progress = (currentPosition / questions.length) * 100; progressBar.style.width = `${progress}%`; }
+function skipToEnd() { stopTimer(); questionPopup.classList.remove('active'); feedbackPopup.classList.remove('active'); currentQuestionIndex = questions.length - 1; currentPosition = questions.length; positionDisplay.innerText = `${currentPosition} / ${questions.length}`; updateProgressBar(); showQuestion(currentQuestionIndex); }
 
 async function saveScore() {
-    // Solo guardamos puntajes en modo competencia y si hay un nombre
     if (gameMode !== 'competition' || !playerName) {
         return;
     }
@@ -321,45 +111,43 @@ async function saveScore() {
     }
 }
 
+
+// --- FUNCIÓN CORREGIDA ---
 async function displayRanking() {
-    // Solo mostramos ranking en modo competencia
-    if (gameMode !== 'competition') return;
-
-    rankingContainer.classList.remove('hidden');
-    rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>Cargando...</p>';
-
+    // Esta función ahora solo genera el HTML de la tabla.
     try {
         const querySnapshot = await db.collection("scores").orderBy("score", "desc").limit(10).get();
         
         if (querySnapshot.empty) {
-            rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>Aún no hay puntajes. ¡Sé el primero!</p>';
-            return;
+            return '<h3>Mejores Puntajes</h3><p>Aún no hay puntajes. ¡Sé el primero!</p>';
         }
 
         let rankingHtml = '<table><thead><tr><th>Pos.</th><th>Nombre</th><th>Puntaje</th></tr></thead><tbody>';
         let rank = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            // Asegurarse de que los datos existen antes de mostrarlos
             const name = data.name || 'Anónimo';
             const scoreValue = data.score !== undefined ? data.score : 'N/A';
             rankingHtml += `<tr><td>${rank}</td><td>${name}</td><td>${scoreValue}</td></tr>`;
             rank++;
         });
         rankingHtml += '</tbody></table>';
-        rankingContainer.innerHTML = rankingHtml;
+        return rankingHtml;
 
     } catch (error) {
         console.error("Error al obtener el ranking: ", error);
-        rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>No se pudo cargar el ranking.</p>';
+        return '<h3>Mejores Puntajes</h3><p>No se pudo cargar el ranking.</p>';
     }
 }
+// --- FIN FUNCIÓN CORREGIDA ---
 
 
+// --- FUNCIÓN CORREGIDA ---
 async function endGame() {
     infoBar.classList.add('hidden');
     progressBarContainer.classList.add('hidden');
 
+    // Primero guardamos el puntaje actual
     await saveScore();
 
     const percentage = Math.round((score / questions.length) * 100);
@@ -373,6 +161,7 @@ async function endGame() {
         finalLevel = "Estudiante de Secundaria";
     }
     
+    // Limpiamos el área de contenido y mostramos los resultados personales
     contentArea.innerHTML = `<p style="font-size: 1.5em;">¡Juego terminado, ${playerName}!<br>Puntaje: ${score}/${questions.length} (${percentage}%)<br>Tu nivel es: <strong>${finalLevel}</strong></p>`;
     
     const summaryDiv = document.createElement('div');
@@ -393,7 +182,10 @@ async function endGame() {
     
     // Solo mostramos el ranking en modo competencia
     if (gameMode === 'competition') {
-        await displayRanking();
+        const rankingHtml = await displayRanking(); // Obtenemos el HTML del ranking
+        rankingContainer.innerHTML = rankingHtml; // Lo ponemos en su contenedor
+        contentArea.appendChild(rankingContainer); // Añadimos el contenedor al área de contenido
+        rankingContainer.classList.remove('hidden');
     }
 
     const finalVideo = document.createElement('video');
@@ -406,6 +198,7 @@ async function endGame() {
     contentArea.appendChild(playAgainBtn);
     playAgainBtn.classList.remove('hidden');
 }
+// --- FIN FUNCIÓN CORREGIDA ---
 
 
 // --- Event Listeners ---

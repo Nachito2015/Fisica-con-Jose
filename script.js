@@ -303,10 +303,9 @@ function skipToEnd() {
     showQuestion(currentQuestionIndex);
 }
 
-// --- NUEVAS FUNCIONES PARA FIREBASE ---
 async function saveScore() {
     if (gameMode !== 'competition' || !playerName) {
-        return; // Solo guardamos puntajes en modo competencia
+        return;
     }
     try {
         await db.collection("scores").add({
@@ -321,35 +320,42 @@ async function saveScore() {
     }
 }
 
+// --- FUNCIÓN MODIFICADA ---
 async function displayRanking() {
     rankingContainer.classList.remove('hidden');
     rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>Cargando...</p>';
 
     try {
+        // Usamos .get() que es el método correcto para obtener los datos una vez
         const querySnapshot = await db.collection("scores").orderBy("score", "desc").limit(10).get();
-        let rankingHtml = '<table><tr><th>Pos.</th><th>Nombre</th><th>Puntaje</th></tr>';
+        
+        if (querySnapshot.empty) {
+            rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>Aún no hay puntajes. ¡Sé el primero!</p>';
+            return;
+        }
+
+        let rankingHtml = '<table><thead><tr><th>Pos.</th><th>Nombre</th><th>Puntaje</th></tr></thead><tbody>';
         let rank = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             rankingHtml += `<tr><td>${rank}</td><td>${data.name}</td><td>${data.score}</td></tr>`;
             rank++;
         });
-        rankingHtml += '</table>';
+        rankingHtml += '</tbody></table>';
         rankingContainer.innerHTML = rankingHtml;
     } catch (error) {
         console.error("Error al obtener el ranking: ", error);
-        rankingContainer.innerHTML = '<p>No se pudo cargar el ranking.</p>';
+        rankingContainer.innerHTML = '<h3>Mejores Puntajes</h3><p>No se pudo cargar el ranking.</p>';
     }
 }
-// --- FIN NUEVAS FUNCIONES ---
+// --- FIN FUNCIÓN MODIFICADA ---
 
 
-// --- FUNCIÓN MODIFICADA ---
 async function endGame() {
     infoBar.classList.add('hidden');
     progressBarContainer.classList.add('hidden');
 
-    await saveScore(); // Guardamos el puntaje antes de mostrar los resultados
+    await saveScore();
 
     const percentage = Math.round((score / questions.length) * 100);
     let finalLevel = "";
@@ -380,7 +386,7 @@ async function endGame() {
     }
     contentArea.appendChild(summaryDiv);
     
-    await displayRanking(); // Mostramos el ranking después del resumen
+    await displayRanking();
 
     const finalVideo = document.createElement('video');
     finalVideo.src = 'assets/final.mp4';
@@ -392,7 +398,6 @@ async function endGame() {
     contentArea.appendChild(playAgainBtn);
     playAgainBtn.classList.remove('hidden');
 }
-// --- FIN FUNCIÓN MODIFICADA ---
 
 
 // --- Event Listeners ---
